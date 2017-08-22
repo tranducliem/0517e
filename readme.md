@@ -9,6 +9,14 @@ composer install
 ```
 - Tạo một database mới tên là _*"demo0517e"*_
 - Mở file ".env" sửa thông tin kết nối đến database
+```php
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=demo0517e
+DB_USERNAME=root
+DB_PASSWORD=
+```
 - Sau đó chạy lệnh để hệ thống generate key:
 ```php
 php artisan key:generate
