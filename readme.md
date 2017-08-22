@@ -1,51 +1,128 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+# Project hướng dẫn lớp PHP0517E
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## Hướng dẫn cài đặt project
 
-## About Laravel
+Sau khi lấy code về các bạn bật Shell di chuyển đến project và chạy lệnh sau:
+- Tải thư viện từ server composer:
+```php
+composer install
+```
+- Tạo một database mới tên là _*"demo0517e"*_
+- Mở file ".env" sửa thông tin kết nối đến database
+- Sau đó chạy lệnh để hệ thống generate key:
+```php
+php artisan key:generate
+```
+- Tiếp theo chạy lệnh để hệ thống sinh ra database: 
+```php
+php artisan migrate
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+Sau khi cài đặt xong truy cập _*localhost/demo0517e/public/index.php*_ để kiểm tra kết quả.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tạo file Migration Product
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications. A superb combination of simplicity, elegance, and innovation give you tools you need to build any application with which you are tasked.
+- Chạy lệnh:
+```php
+php artisan make:migration create_products_table --create=products
+```
 
-## Learning Laravel
+- Mở file "create_products_table" và sửa nội dung như sau:
+```php
+public function up()
+{
+    Schema::create('products', function (Blueprint $table) {
+        $table->increments('id');
+        $table->string('name');
+        $table->string('description')->nullable();
+        $table->text('content')->nullable();
+        $table->string('thumbnail')->nullable();
+        $table->float('price')->default(0);
+        $table->string('status')->default('0');
+        $table->timestamps();
+    });
+}
+```
 
-Laravel has the most extensive and thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is thorough, complete, and makes it a breeze to get started learning the framework.
+- Tiếp theo chạy lệnh để hệ thống sinh ra database: 
+```php
+php artisan migrate
+```
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 900 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
+## Hướng dẫn tạo Model Product
 
-## Laravel Sponsors
+- Chạy lệnh:
+```php
+php artisan make:model Product
+```
 
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](http://patreon.com/taylorotwell):
+- Sử dụng tinker để test, gõ lệnh sau:
+```php
+php artisan tinker
+$p = new App\Product();
+$p->name = "San pham 1";
+$p->save();
+exit
+```
+    
+## Hướng dẫn tạo Product Controller
 
-- **[Vehikl](http://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Styde](https://styde.net)**
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
+- Chạy lệnh:
+```php
+php artisan make:controller ProductController --resource
+```
+- Mở file "ProductController.php" và thêm nội dung function index
+```php
+use Illuminate\Http\Request;
+use App\Product; //Nhớ thêm thư viện
 
-## Contributing
+class ProductController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $products = Product::all();
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+        return view('product.index', [ 'products' => $products ]);
+    }
+    
+    ....................
+}
+```
 
-## Security Vulnerabilities
+## Hướng dẫn tạo Product View
+- Tạo file view nằm trong đường dẫn "resources/views/product/index.blade.php" với nội dung như sau:
+```php
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
+    @if(isset($products))
+        @foreach($products as $item)
+            <tr>
+                <td>{{ $item->id }}</td>
+                <td>{{ $item->name }}</td>
+            </tr>
+        @endforeach
+    @endif
+</table>
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+## Hướng dẫn tạo Route cho Product
+- Mở file "_*routes/web.php*_" thêm dòng sua:
+```php
+Route::get('/', function () {
+    return view('welcome');
+});
 
-## License
+//thêm dòng này
+Route::get('product', 'ProductController@index'); 
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+
