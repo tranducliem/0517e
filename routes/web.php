@@ -17,3 +17,7 @@ Route::get('/', function () {
 
 Route::get('product', 'ProductController@index');
 
+//news
+Route::get('news/create', 'NewsController@create');
+Route::post('news', 'NewsController@store');
+

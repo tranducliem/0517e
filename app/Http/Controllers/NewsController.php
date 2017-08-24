@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\News;
+use Session;
 use Illuminate\Http\Request;
-use App\Product;
 
-class ProductController extends Controller
+class NewsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
-
-        return view('product.index', [ 'abc' => $products ]);
+        //
     }
 
     /**
@@ -26,7 +25,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return view('news.create');
     }
 
     /**
@@ -37,7 +36,17 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'title' => 'required'
+        ]);
+
+        $n = new News();
+        $n->title = $request->title;
+        $n->save();
+
+        Session::flash('success', 'Thêm mới thành công!!!');
+
+        return redirect('news/create');
     }
 
     /**
