@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\News;
-use Session;
+use App\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Hash;
 
-class NewsController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,12 +16,9 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $list = News::orderBy('created_at', 'DESC')->get();
-        $data = [
-            'list' => $list
-        ];
+        $users = User::all();
 
-        return view('news.show', $data);
+        return view('admin.user.list', ['users' => $users]);
     }
 
     /**
@@ -30,7 +28,7 @@ class NewsController extends Controller
      */
     public function create()
     {
-        return view('news.create');
+        return view('admin.user.create');
     }
 
     /**
@@ -42,16 +40,18 @@ class NewsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required'
+            'name' => 'required',
+            'email' => 'required|email',
         ]);
 
-        $n = new News();
-        $n->title = $request->title;
-        $n->save();
+        $usr = new User();
+        $usr->name = $request->name;
+        $usr->email = $request->email;
+        $usr->password = Hash::make('123456');
+        $usr->group_id = 2;
+        $usr->save();
 
-        Session::flash('success', 'Thêm mới thành công!!!');
-
-        return redirect('news');
+        return redirect('admin/user');
     }
 
     /**
@@ -73,9 +73,7 @@ class NewsController extends Controller
      */
     public function edit($id)
     {
-        $post = News::findOrFail($id);
-
-        return view('news.edit', ['news' => $post]);
+        //
     }
 
     /**
@@ -87,16 +85,7 @@ class NewsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'title' => 'required'
-        ]);
-
-        $post = News::findOrFail($id);
-        $post->title = $request->title;
-        $post->save();
-        Session::flash('success', 'Cập nhật thành công!!!');
-
-        return redirect('news');
+        //
     }
 
     /**
@@ -107,13 +96,6 @@ class NewsController extends Controller
      */
     public function destroy($id)
     {
-
-        $post = News::findOrFail($id);
-        $title = $post->title;
-        $post->delete();
-
-        Session::flash('success', 'Xóa tin tức "'.$title.'" thành công!!!');
-
-        return redirect('news');
+        //
     }
 }
